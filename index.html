@@ -1,73 +1,57 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml">
-  <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>Babylon Template</title>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title>Simple XR Box</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+    }
+    #renderCanvas {
+      width: 100%;
+      height: 100%;
+      touch-action: none;
+    }
+  </style>
+  <script src="https://cdn.babylonjs.com/babylon.js"></script>
+  <script src="https://cdn.babylonjs.com/loaders/babylonjs.loaders.min.js"></script>
+</head>
+<body>
+  <canvas id="renderCanvas"></canvas>
 
-    <style>
-      html,
-      body {
-        overflow: hidden;
-        width: 100%;
-        height: 100%;
-        margin: 0;
-        padding: 0;
-      }
+  <script>
+    const canvas = document.getElementById("renderCanvas");
+    const engine = new BABYLON.Engine(canvas, true);
 
-      #renderCanvas {
-        width: 100%;
-        height: 100%;
-        touch-action: none;
-      }
-    </style>
+    const createScene = async () => {
+      const scene = new BABYLON.Scene(engine);
 
-    <script src="https://cdn.babylonjs.com/babylon.js"></script>
-    <script src="https://cdn.babylonjs.com/loaders/babylonjs.loaders.min.js"></script>
-    <script src="https://code.jquery.com/pep/0.4.3/pep.js"></script>
-  </head>
+      const camera = new BABYLON.UniversalCamera("camera", new BABYLON.Vector3(0, 1.6, -3), scene);
+      camera.setTarget(BABYLON.Vector3.Zero());
+      camera.attachControl(canvas, true);
 
-  <body>
-    <canvas id="renderCanvas" touch-action="none"></canvas>
-    <!-- touch-action="none" for best results from PEP -->
+      const light = new BABYLON.HemisphericLight("light", new BABYLON.Vector3(0, 1, 0), scene);
 
-    <script>
+      const box = BABYLON.MeshBuilder.CreateBox("box", { size: 1 }, scene);
+      box.position.y = 1;
 
-const canvas = document.getElementById("renderCanvas"); // Get the canvas element
-const engine = new BABYLON.Engine(canvas, true); // Generate the BABYLON 3D engine
+      // Set up XR
+      const xr = await scene.createDefaultXRExperienceAsync({
+        floorMeshes: []
+      });
 
-function main(scene)
-{
-       engine.runRenderLoop(function () {
-           scene.render();
-        });
-        // Watch for browser/canvas resize events
-        window.addEventListener("resize", function () {
-           engine.resize();
-        });
-}     
+      return scene;
+    };
 
-const createScene = async function () {
-    const scene = new BABYLON.Scene(engine);
+    createScene().then(scene => {
+      engine.runRenderLoop(() => scene.render());
+    });
 
-    const camera = new BABYLON.ArcRotateCamera("camera", -Math.PI / 2, Math.PI / 2.5, 3, new BABYLON.Vector3(0, 0, 0));
-    camera.attachControl(canvas, true);
-
-    const light = new BABYLON.HemisphericLight("light", new BABYLON.Vector3(0, 1, 0));
-
-    const box = BABYLON.MeshBuilder.CreateBox("box", {});
-    
-    // XR
-    var xr = await scene.createDefaultXRExperienceAsync();
-
-    return scene;
-}
-     
-
-createScene().then((scene) =>{
-    main(scene); 
-}); 
-
-
-    </script>
-  </body>
+    window.addEventListener("resize", () => engine.resize());
+  </script>
+</body>
 </html>
