@@ -36,6 +36,11 @@
 
       const light = new BABYLON.HemisphericLight("light", new BABYLON.Vector3(0, 1, 0), scene);
 
+      //Load glb file
+      BABYLON.SceneLoader.AppendAsync("./", "HeartFinalized.glb", scene).then(() => {
+               // Optional: Perform actions after the model is loaded
+            });
+
       const box = BABYLON.MeshBuilder.CreateBox("box", { size: 1 }, scene);
       box.position.y = 1;
 
